@@ -5,11 +5,14 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
@@ -65,6 +68,28 @@ public class UploadController {
 
         return "showImage";
         //return "upload-form";
+    }
+
+    @GetMapping("/draw")
+    public String draw() {
+        return "Canvas";
+    }
+
+    @PostMapping("/drawUpload")
+    public String uploadImage(@RequestParam("file") MultipartFile file, Model model) throws IOException {
+
+        String uuid = UUID.randomUUID().toString();
+
+        String fullPath = uploadS3.upload(file, uuid);
+
+        Image image = new Image(fullPath, uuid, file.getOriginalFilename());
+
+        log.info("fullPath={} \nuuid={} \nfileName = {} ", fullPath, uuid, file.getOriginalFilename());
+        imageMapper.insertImageInfo(image);
+
+        model.addAttribute("imageLink", image.getImageLink());
+
+        return "showImage";
     }
 
     @GetMapping("/imageList")
