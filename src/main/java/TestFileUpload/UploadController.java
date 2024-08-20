@@ -1,18 +1,17 @@
 package TestFileUpload;
 
 
+import TestFileUpload.service.UploadS3;
+import TestFileUpload.service.UploadService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
@@ -23,8 +22,8 @@ import java.util.UUID;
 @RequestMapping("/spring")
 public class UploadController {
 
-    private final UploadS3 uploadS3;
     private final ImageMapper imageMapper;
+    private final UploadService uploadService;
 
     @Value("${file.dir}")
     private String fileDir;
@@ -43,49 +42,7 @@ public class UploadController {
         log.info("itemName={}", itemName);
         log.info("multipartFile={}", file);
 
-        String uuid = UUID.randomUUID().toString();
-
-        String fullPath = uploadS3.upload(file, uuid);
-
-        Image image = new Image(fullPath, uuid, file.getOriginalFilename());
-        log.info("fullPath={} \nuuid={} \nfileName = {} ", fullPath, uuid, file.getOriginalFilename());
-        imageMapper.insertImageInfo(image);
-
-
-        /*
-        String fullPath = "";
-
-        if (!file.isEmpty()) {
-
-            fullPath = fileDir + file.getOriginalFilename();
-            log.info("파일 저장 fullPath={}", fullPath);
-            file.transferTo(new File(fullPath));
-
-        }
-         */
-
-        model.addAttribute("imageLink", image.getImageLink());
-
-        return "showImage";
-        //return "upload-form";
-    }
-
-    @GetMapping("/draw")
-    public String draw() {
-        return "Canvas";
-    }
-
-    @PostMapping("/drawUpload")
-    public String uploadImage(@RequestParam("file") MultipartFile file, Model model) throws IOException {
-
-        String uuid = UUID.randomUUID().toString();
-
-        String fullPath = uploadS3.upload(file, uuid);
-
-        Image image = new Image(fullPath, uuid, file.getOriginalFilename());
-
-        log.info("fullPath={} \nuuid={} \nfileName = {} ", fullPath, uuid, file.getOriginalFilename());
-        imageMapper.insertImageInfo(image);
+        Image image = uploadService.uploadFile(file);
 
         model.addAttribute("imageLink", image.getImageLink());
 
@@ -95,14 +52,6 @@ public class UploadController {
     @GetMapping("/imageList")
     public String imageList(Model model) {
         List<Image> list = imageMapper.findAll();
-
-        for (Image image : list) {
-            System.out.println(image.getImageLink());
-            System.out.println(image.getImageUuid());
-            System.out.println(image.getImageDate());
-            System.out.println(image.getImageName());
-            System.out.println(image.getId());
-        }
 
         model.addAttribute("items", list);
 

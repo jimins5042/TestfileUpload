@@ -1,4 +1,4 @@
-package TestFileUpload;
+package TestFileUpload.service;
 
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.HttpMethod;
