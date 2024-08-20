@@ -14,11 +14,21 @@
          alt="...."-->
 
 
-    <img th:src="${fullPath}" alt = "...">
+    <img th:src="${imageLink}" alt="...">
 
 
-    <p th:text="'링크 : ' + ${fullPath}">안녕하세요, 손님</p>
+    <p th:text="'링크 : ' + ${imageLink}">안녕하세요, 손님</p>
 
+</div>
+<div class="row">
+    <div class="col">
+        <button class="btn btn-primary float-end"
+                onclick="location.href='addForm.html'"
+                th:onclick="|location.href='@{/spring/imageList}'|"
+
+                type="button">저장한 이미지 리스트
+        </button>
+    </div>
 </div>
 </body>
 </html>
