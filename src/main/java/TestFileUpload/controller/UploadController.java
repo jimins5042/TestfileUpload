@@ -1,6 +1,8 @@
-package TestFileUpload;
+package TestFileUpload.controller;
 
 
+import TestFileUpload.Image;
+import TestFileUpload.ImageMapper;
 import TestFileUpload.service.UploadS3;
 import TestFileUpload.service.UploadService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,7 +16,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.UUID;
 
 @Controller
 @Slf4j
@@ -24,9 +25,7 @@ public class UploadController {
 
     private final ImageMapper imageMapper;
     private final UploadService uploadService;
-
-    @Value("${file.dir}")
-    private String fileDir;
+    private final UploadS3 uploadS3;
 
     @GetMapping("/upload")
     public String newFile() {
@@ -62,12 +61,23 @@ public class UploadController {
     public String item(@PathVariable String id, Model model) {
         log.info("itemId={}", id);
 
-        String imageLink = imageMapper.findImageByUuid(id);
+        String imageLink = imageMapper.findImageByImageLink(id);
+
+
         log.info("imageLink={}", imageLink);
         model.addAttribute("imageLink", imageLink);
 
 
         return "showImage";
+    }
+
+    @GetMapping("/imageList/delete/{id}")
+    public String deleteItem(@PathVariable String id) {
+        log.info("deleteItem={}", id);
+        uploadService.deleteImage(id);
+
+        return "redirect:/spring/imageList";
+
     }
 
 }

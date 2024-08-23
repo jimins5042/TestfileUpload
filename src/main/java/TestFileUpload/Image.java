@@ -4,8 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.Date;
-import java.util.UUID;
+import java.text.SimpleDateFormat;
 
 @Slf4j
 @Getter
@@ -15,7 +14,7 @@ public class Image {
     private String imageLink;
     private String imageUuid;
     private String imageName;
-    private Date imageDate;
+    private String imageDate;
 
     public Image() {
 
@@ -28,12 +27,12 @@ public class Image {
 
     }
 
-    public Image(int id, String imageLink, String imageUuid, String imageName, Date imageDate) {
+    public Image(int id, String imageLink, String imageUuid, String imageName, String imageDate) {
         this.id = id;
         this.imageLink = imageLink;
         this.imageUuid = imageUuid;
         this.imageName = imageName;
-        this.imageDate = imageDate;
+        this.imageDate = new SimpleDateFormat("yyyy.MM.dd a HH:mm:ss").format(imageDate);
     }
 }
 

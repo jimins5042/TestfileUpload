@@ -39,10 +39,10 @@ public class UploadS3 {
     }
 
     /* 2. 파일 삭제 */
-    public void delete (String keyName) {
+    public void delete (String s3FileName) {
         try {
             // deleteObject(버킷명, 키값)으로 객체 삭제
-            amazonS3.deleteObject(bucket, keyName);
+            amazonS3.deleteObject(bucket, s3FileName);
         } catch (AmazonServiceException e) {
             log.error(e.toString());
         }

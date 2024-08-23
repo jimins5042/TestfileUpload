@@ -30,4 +30,11 @@ public class UploadService {
 
         return image;
     }
+
+    public void deleteImage(String id) {
+        uploadS3.delete(imageMapper.findImageByUuid(id));
+        log.info("deleteImage={}", imageMapper.findImageByUuid(id));
+        imageMapper.deleteImage(id);
+
+    }
 }

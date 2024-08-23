@@ -4,26 +4,28 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>그림 그리기</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+
     <style>
-        body, html {
-            margin: 0;
-            padding: 0;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
+        #canvasContainer {
+            position: relative;
+            width: 100%;
+            padding-top: 50%; /* 4:3 비율을 위한 75% 패딩 */
+
         }
         #canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             border: 3px double;
             cursor: pointer;
+
         }
-        #palette {
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            margin: 20px 0;
-        }
+
+
         #palette span {
             cursor: pointer;
             color: white;
@@ -43,39 +45,60 @@
         }
     </style>
 </head>
-<body>
-<canvas id="canvas"></canvas>
-<div id="palette">
-    <span class="red">red</span>
-    <span class="orange">orange</span>
-    <span class="yellow">yellow</span>
-    <span class="green">green</span>
-    <span class="blue">blue</span>
-    <span class="navy">navy</span>
-    <span class="purple">purple</span>
-    <span class="black">black</span>
-    <span class="white">white</span>
-    <span class="clear">clear</span>
-    <span class="fill">fill</span>
+<body class="d-flex flex-column align-items-center justify-content-center">
+
+<div class="container">
+    <div class="row">
+        <div id="canvasContainer" class="col-12">
+            <canvas id="canvas"></canvas>
+        </div>
+    </div>
+    <div class="row">
+        <div id="palette" class="col-12 d-flex flex-wrap justify-content-center mt-4">
+            <span class="red">red</span>
+            <span class="orange">orange</span>
+            <span class="yellow">yellow</span>
+            <span class="green">green</span>
+            <span class="blue">blue</span>
+            <span class="navy">navy</span>
+            <span class="purple">purple</span>
+            <span class="black">black</span>
+            <span class="white">white</span>
+            <span class="clear">clear</span>
+            <span class="fill">fill</span>
+        </div>
+    </div>
+    <div class="row mt-3">
+        <div class="col-6 text-right">
+            <button id="downloadBtn" class="btn btn-primary">Download Image</button>
+        </div>
+        <div class="col-6 text-left">
+            <button id="uploadBtn" class="btn btn-success">Upload Image</button>
+        </div>
+    </div>
 </div>
-<button id="downloadBtn">Download Image</button>
-<button id="uploadBtn">Upload Image</button>
+
+<!-- Bootstrap JS and dependencies -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.6/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
 <script>
     const canvas = document.querySelector("#canvas");
     const ctx = canvas.getContext("2d");
 
-    // 화면 크기에 맞게 캔버스 크기 설정
     function resizeCanvas() {
-        canvas.width = window.innerWidth * 0.8; // 창 너비의 80%
-        canvas.height = window.innerHeight * 0.6; // 창 높이의 60%
+        // 캔버스의 컨테이너 크기에 맞춰 캔버스 크기 조정
+        const container = document.querySelector("#canvasContainer");
+        canvas.width = container.clientWidth;
+        canvas.height = container.clientHeight;
     }
     window.addEventListener('resize', resizeCanvas);
     resizeCanvas();
 
     let painting = false;
 
-    function stopPainting(event) {
+    function stopPainting() {
         painting = false;
     }
 
@@ -86,8 +109,12 @@
     ctx.lineWidth = 3;
 
     function onMouseMove(event) {
-        const x = event.offsetX;
-        const y = event.offsetY;
+        // 캔버스의 위치 정보를 가져옵니다.
+        const rect = canvas.getBoundingClientRect();
+        // 마우스의 좌표에서 캔버스의 왼쪽 상단 위치를 빼줍니다.
+        const x = event.clientX - rect.left;
+        const y = event.clientY - rect.top;
+
         if (!painting) {
             ctx.beginPath();
             ctx.moveTo(x, y);
@@ -150,7 +177,6 @@
             .then(response => {
                 if (response.ok) {
                     window.location.href = '/spring/imageList';
-
                 } else {
                     console.error('File upload failed');
                 }

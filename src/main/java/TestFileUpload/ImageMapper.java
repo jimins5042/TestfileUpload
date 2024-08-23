@@ -15,5 +15,12 @@ public interface ImageMapper {
     void insertImageInfo(Image image);
 
     @Select("SELECT image_link from image_storage where id = #{id}")
+    String findImageByImageLink(String id);
+
+    @Select("SELECT uuid as imageUuid from image_storage where id = #{id}")
     String findImageByUuid(String id);
+
+    @Delete("DELETE FROM image_storage WHERE id = #{id}")
+    void deleteImage(String id);
+
 }
