@@ -3,7 +3,6 @@ package TestFileUpload.controller;
 
 import TestFileUpload.Image;
 import TestFileUpload.ImageMapper;
-import TestFileUpload.service.UploadS3;
 import TestFileUpload.service.UploadService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +23,7 @@ public class UploadController {
 
     private final ImageMapper imageMapper;
     private final UploadService uploadService;
-    private final UploadS3 uploadS3;
+
 
     @GetMapping("/upload")
     public String newFile() {
