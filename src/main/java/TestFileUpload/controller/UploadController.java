@@ -24,7 +24,6 @@ public class UploadController {
     private final ImageMapper imageMapper;
     private final UploadService uploadService;
 
-
     @GetMapping("/upload")
     public String newFile() {
         return "upload-form";
@@ -58,13 +57,10 @@ public class UploadController {
     @GetMapping("/imageList/{id}")
     public String item(@PathVariable String id, Model model) {
         log.info("itemId={}", id);
-
         String imageLink = imageMapper.findImageByImageLink(id);
-
 
         log.info("imageLink={}", imageLink);
         model.addAttribute("imageLink", imageLink);
-
 
         return "showImage";
     }

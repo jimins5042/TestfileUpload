@@ -27,6 +27,7 @@ public class DrawController {
         return "Canvas";
     }
 
+
     @PostMapping("/drawUpload")
     public String uploadImage(@RequestParam("file") MultipartFile file, Model model) throws IOException {
 

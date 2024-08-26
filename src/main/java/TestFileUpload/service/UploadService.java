@@ -22,13 +22,14 @@ import java.util.UUID;
 public class UploadService {
 
     private final AmazonS3 amazonS3;
-    //private final UploadS3 uploadS3;
     private final ImageMapper imageMapper;
 
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
 
+    //aws s3에 이미지 업로드
     public Image uploadFile(MultipartFile file) throws IOException {
+
         String uuid = UUID.randomUUID().toString();
 
         ObjectMetadata objMeta = new ObjectMetadata();
@@ -36,28 +37,32 @@ public class UploadService {
 
         // putObject(버킷명, 파일명, 파일데이터, 메타데이터)로 S3에 객체 등록
         amazonS3.putObject(bucket, uuid, file.getInputStream(), objMeta);
+
         // 등록된 객체의 url 반환 (decoder: url 안의 한글or특수문자 깨짐 방지)
         String fullPath = URLDecoder.decode(amazonS3.getUrl(bucket, uuid).toString(), "utf-8");
 
         Image image = new Image(fullPath, uuid, file.getOriginalFilename());
 
         log.info("fullPath={} \nuuid={} \nfileName = {} ", fullPath, uuid, file.getOriginalFilename());
-        imageMapper.insertImageInfo(image);
+        imageMapper.insertImageInfo(image); //이미지 주소, 이름 저장
 
         return image;
     }
 
+    //aws s3에 이미지 삭제
     public void deleteImage(String id) {
 
         try {
             // deleteObject(버킷명, 키값)으로 객체 삭제
             amazonS3.deleteObject(bucket, imageMapper.findImageByUuid(id));
+
+            log.info("deleteImage={}", imageMapper.findImageByUuid(id));
+            imageMapper.deleteImage(id);    // db에 저장된 이미지 정보 삭제
+
         } catch (AmazonServiceException e) {
             log.error(e.toString());
         }
 
-        log.info("deleteImage={}", imageMapper.findImageByUuid(id));
-        imageMapper.deleteImage(id);
 
     }
 }
