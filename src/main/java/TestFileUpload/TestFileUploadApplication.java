@@ -8,7 +8,12 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class TestFileUploadApplication {
 
 	public static void main(String[] args) {
-		//Dotenv dotenv = Dotenv.load();
+
+		try{
+			Dotenv dotenv = Dotenv.load();
+		}catch (Exception e){
+			e.printStackTrace();
+		}
 		SpringApplication.run(TestFileUploadApplication.class, args);
 	}
 

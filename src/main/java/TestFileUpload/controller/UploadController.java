@@ -34,10 +34,7 @@ public class UploadController {
                            @RequestParam MultipartFile file, HttpServletRequest request,
                            Model model) throws IOException {
 
-        log.info("request={}", request);
-        log.info("itemName={}", itemName);
-        log.info("multipartFile={}", file);
-
+        log.info("=== 파일 업로드 ===");
         Image image = uploadService.uploadFile(file);
 
         model.addAttribute("imageLink", image.getImageLink());
@@ -47,6 +44,8 @@ public class UploadController {
 
     @GetMapping("/imageList")
     public String imageList(Model model) {
+
+        log.info("=== 이미지 리스트 조회 ===");
         List<Image> list = imageMapper.findAll();
 
         model.addAttribute("items", list);
@@ -56,10 +55,12 @@ public class UploadController {
 
     @GetMapping("/imageList/{id}")
     public String item(@PathVariable String id, Model model) {
-        log.info("itemId={}", id);
+
+        log.info("=== 이미지 상세 조회 ===");
+
         String imageLink = imageMapper.findImageByImageLink(id);
 
-        log.info("imageLink={}", imageLink);
+        log.info("itemId={}, imageLink={}", id, imageLink);
         model.addAttribute("imageLink", imageLink);
 
         return "showImage";
@@ -67,7 +68,7 @@ public class UploadController {
 
     @GetMapping("/imageList/delete/{id}")
     public String deleteItem(@PathVariable String id) {
-        log.info("deleteItem={}", id);
+        log.info("=== {}번 이미지 삭제 ===", id);
         uploadService.deleteImage(id);
 
         return "redirect:/spring/imageList";
