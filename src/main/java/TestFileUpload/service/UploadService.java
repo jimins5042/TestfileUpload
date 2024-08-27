@@ -34,17 +34,25 @@ public class UploadService {
 
         ObjectMetadata objMeta = new ObjectMetadata();
         objMeta.setContentLength(file.getInputStream().available());
+        Image image;
 
+        try {
+            amazonS3.putObject(bucket, uuid, file.getInputStream(), objMeta);
+
+            // 등록된 객체의 url 반환 (decoder: url 안의 한글or특수문자 깨짐 방지)
+            String fullPath = URLDecoder.decode(amazonS3.getUrl(bucket, uuid).toString(), "utf-8");
+
+            image = new Image(fullPath, uuid, file.getOriginalFilename());
+
+            log.info("fullPath={} \nuuid={} \nfileName = {} ", fullPath, uuid, file.getOriginalFilename());
+            imageMapper.insertImageInfo(image); //이미지 주소, 이름 저장
+
+        }catch (AmazonServiceException e) {
+            log.info("=== 이미지 저장 중 에러 발생)");
+            e.printStackTrace();
+            image = imageMapper.findErrorImageLink();
+        }
         // putObject(버킷명, 파일명, 파일데이터, 메타데이터)로 S3에 객체 등록
-        amazonS3.putObject(bucket, uuid, file.getInputStream(), objMeta);
-
-        // 등록된 객체의 url 반환 (decoder: url 안의 한글or특수문자 깨짐 방지)
-        String fullPath = URLDecoder.decode(amazonS3.getUrl(bucket, uuid).toString(), "utf-8");
-
-        Image image = new Image(fullPath, uuid, file.getOriginalFilename());
-
-        log.info("fullPath={} \nuuid={} \nfileName = {} ", fullPath, uuid, file.getOriginalFilename());
-        imageMapper.insertImageInfo(image); //이미지 주소, 이름 저장
 
         return image;
     }
